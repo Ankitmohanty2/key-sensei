@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import TypingTest from "@/components/TypingTest";
 import Image from "next/image";
 import keySenseiLogo from "./key-sensei-logo.png";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const THEMES = [
   { value: "classic", label: "Classic" },
@@ -82,7 +83,7 @@ export default function Home() {
     updateIndicatorStyle(wordOptionRefs, selectedWords, "words");
   }, []);
   return (
-    <main className="min-h-screen bg-[#1a1a1a] flex flex-col pb-56">
+    <main className="min-h-screen bg-background flex flex-col pb-56">
       {/* Fixed vertical theme sidebar */}
       {testStatus !== "finished" && <div className="fixed right-6 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-4">
         {THEMES.map((t) => {
@@ -97,7 +98,7 @@ export default function Home() {
                 className={[
                   "w-5 h-5 rounded-md transition-all duration-200",
                   active
-                    ? "ring-2 ring-white ring-offset-2 ring-offset-[#1a1a1a] scale-110"
+                    ? "ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110"
                     : "opacity-50 hover:opacity-80",
                 ].join(" ")}
                 style={{ backgroundColor: THEME_COLORS[t.value] }}
@@ -105,7 +106,7 @@ export default function Home() {
               <span
                 className={[
                   "text-[8px] font-mono tracking-widest uppercase transition-colors duration-200",
-                  active ? "text-white" : "text-gray-600 group-hover:text-gray-400",
+                  active ? "text-foreground" : "text-muted-foreground group-hover:text-muted-foreground",
                 ].join(" ")}
               >
                 {t.value}
@@ -115,19 +116,19 @@ export default function Home() {
         })}
       </div>}
 
-      {testStatus !== "finished" && <header className="w-full h-16 bg-[#1a1a1a] flex items-center px-10 gap-6">
+      {testStatus !== "finished" && <header className="w-full h-16 bg-background flex items-center px-10 gap-6">
         <div className="font-mono flex items-center gap-4">
           <Image
             src={keySenseiLogo}
             alt="Key Sensei logo"
             width={80}
             height={80}
-            className="h-14 w-auto object-contain scale-125"
+            className="h-14 w-auto object-contain scale-125 invert dark:invert-0"
             priority
           />
           <div className="flex items-center gap-3">
-            <span className="text-[#646669] text-2xl leading-none">/</span>
-            <span className="font-bold text-[#E2B714] text-2xl leading-none pt-[1px]">Key Sensei</span>
+            <span className="text-muted-foreground text-2xl leading-none">/</span>
+            <span className="font-bold text-[var(--typo-active)] text-2xl leading-none pt-[1px]">Key Sensei</span>
           </div>
         </div>
 
@@ -141,8 +142,8 @@ export default function Home() {
               className={[
                 "px-2 py-1 rounded text-xs font-mono cursor-pointer transition-colors",
                 mode === "time"
-                  ? "text-[#E2B714]"
-                  : "text-gray-500 hover:text-gray-300",
+                  ? "text-[var(--typo-active)]"
+                  : "text-muted-foreground hover:text-foreground",
               ].join(" ")}
             >
               ⏱ time
@@ -153,25 +154,25 @@ export default function Home() {
               className={[
                 "px-2 py-1 rounded text-xs font-mono cursor-pointer transition-colors",
                 mode === "words"
-                  ? "text-[#E2B714]"
-                  : "text-gray-500 hover:text-gray-300",
+                  ? "text-[var(--typo-active)]"
+                  : "text-muted-foreground hover:text-foreground",
               ].join(" ")}
             >
               A words
             </button>
           </div>
 
-          <span className="text-gray-600">|</span>
+          <span className="text-muted-foreground">|</span>
 
-          <div className="relative flex items-center gap-1 bg-[#1a1a1a] rounded-full px-1 py-1">
+          <div className="relative flex items-center gap-1 bg-muted rounded-full px-1 py-1">
             {(mode === "time" && timeIndicatorStyle) || (mode === "words" && wordIndicatorStyle) ? (
               <div
-                className="absolute rounded-full bg-[#2a2a2a] transition-all duration-300 ease-in-out"
+                className="absolute rounded-full bg-background transition-all duration-300 ease-in-out shadow-sm"
                 style={{
                   left: mode === "time" ? timeIndicatorStyle!.left : wordIndicatorStyle!.left,
                   width: mode === "time" ? timeIndicatorStyle!.width : wordIndicatorStyle!.width,
-                  top: 0,
-                  bottom: 0,
+                  top: 2,
+                  bottom: 2,
                 }}
               />
             ) : null}
@@ -202,8 +203,8 @@ export default function Home() {
                   className={[
                     "relative z-10 px-3 py-1 rounded-full text-xs font-mono cursor-pointer transition-colors",
                     active
-                      ? "text-white font-medium"
-                      : "text-gray-500 hover:text-gray-300",
+                      ? "text-foreground font-medium"
+                      : "text-muted-foreground hover:text-foreground",
                   ].join(" ")}
                 >
                   {opt.label}
@@ -211,6 +212,8 @@ export default function Home() {
               );
             })}
           </div>
+          <div className="mx-2 text-muted-foreground/30">|</div>
+          <ThemeToggle />
         </div>
       </header>}
 
@@ -224,7 +227,7 @@ export default function Home() {
       </div>
 
       {testStatus !== "finished" && (
-        <div className="fixed bottom-0 left-0 right-0 flex flex-col items-center justify-center pb-6 bg-gradient-to-t from-[#1a1a1a] to-transparent pt-10">
+        <div className="fixed bottom-0 left-0 right-0 flex flex-col items-center justify-center pb-6 bg-gradient-to-t from-background to-transparent pt-10">
           <div className="w-full max-w-[828px] mx-auto transform scale-100 flex justify-center">
             <Keyboard
               theme={theme}

@@ -5,13 +5,13 @@ import { useEffect, useRef, useState } from "react";
 type Status = "idle" | "running" | "finished";
 
 const COLORS = {
-  bg: "#1a1a1a",
-  active: "#E2B714",
-  muted: "#646669",
-  hover: "#D1D0C5",
-  correct: "#D1D0C5",
-  incorrect: "#CA4754",
-  extra: "#7E2A33",
+  bg: "var(--typo-bg)",
+  active: "var(--typo-active)",
+  muted: "var(--typo-muted)",
+  hover: "var(--typo-hover)",
+  correct: "var(--typo-correct)",
+  incorrect: "var(--typo-incorrect)",
+  extra: "var(--typo-extra)",
 } as const;
 
 const WORDS_200: string[] = [
