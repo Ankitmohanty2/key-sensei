@@ -5,6 +5,10 @@ import TypingTest from "@/components/TypingTest";
 import Image from "next/image";
 import keySenseiLogo from "./key-sensei-logo.png";
 import { ThemeToggle } from "@/components/theme-toggle";
+import {
+  IconAt, IconClock, IconLetterA, IconQuote,
+  IconMountain, IconNumber, IconFeather, IconFlame,
+} from "@tabler/icons-react";
 
 const THEMES = [
   { value: "classic", label: "Classic" },
@@ -83,141 +87,81 @@ export default function Home() {
     updateIndicatorStyle(wordOptionRefs, selectedWords, "words");
   }, []);
   return (
-    <main className="min-h-screen bg-background flex flex-col pb-56">
-      {/* Fixed vertical theme sidebar */}
-      {testStatus !== "finished" && <div className="fixed right-6 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-4">
-        {THEMES.map((t) => {
-          const active = t.value === theme;
-          return (
-            <div
-              key={t.value}
-              className="flex flex-col items-center gap-1.5 cursor-pointer group"
-              onClick={() => setTheme(t.value)}
-            >
-              <div
-                className={[
-                  "w-5 h-5 rounded-md transition-all duration-200",
-                  active
-                    ? "ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110"
-                    : "opacity-50 hover:opacity-80",
-                ].join(" ")}
-                style={{ backgroundColor: THEME_COLORS[t.value] }}
-              />
-              <span
-                className={[
-                  "text-[8px] font-mono tracking-widest uppercase transition-colors duration-200",
-                  active ? "text-foreground" : "text-muted-foreground group-hover:text-muted-foreground",
-                ].join(" ")}
-              >
-                {t.value}
-              </span>
-            </div>
-          );
-        })}
-      </div>}
-
-      {testStatus !== "finished" && <header className="w-full h-16 bg-background flex items-center px-10 gap-6">
-        <div className="font-mono flex items-center gap-4">
-          <Image
-            src={keySenseiLogo}
-            alt="Key Sensei logo"
-            width={80}
-            height={80}
-            className="h-14 w-auto object-contain scale-125 invert dark:invert-0"
-            priority
-          />
+    <main className="h-screen w-screen overflow-hidden bg-background flex flex-col pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+      {testStatus !== "finished" && (
+        <header className="flex-none w-full max-w-[1240px] mx-auto h-20 flex items-center px-6 md:px-10 justify-between">
+          <div className="font-mono flex items-center gap-4">
+            <Image
+              src={keySenseiLogo}
+              alt="Key Sensei logo"
+              width={80}
+              height={80}
+              className="h-10 w-auto object-contain scale-[1.3] invert dark:invert-0 opacity-80 hover:opacity-100 transition-opacity"
+              priority
+            />
+            <span className="font-bold text-[var(--typo-active)] text-3xl tracking-widest leading-none pt-1">Key Sensei</span>
+          </div>
+          
           <div className="flex items-center gap-3">
-            <span className="text-muted-foreground text-2xl leading-none">/</span>
-            <span className="font-bold text-[var(--typo-active)] text-2xl leading-none pt-[1px]">Key Sensei</span>
+             <div className="hidden sm:flex gap-2 items-center bg-muted/20 px-3 py-2 rounded-xl mr-2 shadow-inner border border-white/5">
+                {THEMES.map((t) => (
+                   <button
+                     key={t.value}
+                     onClick={() => setTheme(t.value)}
+                     style={{ backgroundColor: THEME_COLORS[t.value] }}
+                     className={[
+                        "w-4 h-4 rounded-full transition-all duration-300",
+                        theme === t.value ? "ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110" : "opacity-40 hover:opacity-100"
+                     ].join(" ")}
+                     title={t.label}
+                   />
+                ))}
+             </div>
+             <ThemeToggle />
           </div>
+        </header>
+      )}
+
+      {testStatus !== "finished" && (
+        <div className="flex-none w-full max-w-[1040px] mx-auto flex flex-wrap justify-center items-center gap-4 transition-all px-4 mt-2">
+           {/* Section 1: Modes */}
+           <div className="flex items-center gap-1 rounded-xl p-1 bg-muted/60 dark:bg-[#1a1b1e]/80 text-muted-foreground shadow-sm border border-border/10">
+              <button 
+                 onClick={() => setMode("time")}
+                 className={["flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors", mode === "time" ? "bg-background dark:bg-[#252729] shadow-sm text-[var(--typo-active)] font-semibold" : "hover:text-foreground"].join(" ")}
+              >
+                  <IconClock size={13} /> time
+              </button>
+              <button 
+                 onClick={() => setMode("words")}
+                 className={["flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors", mode === "words" ? "bg-background dark:bg-[#252729] shadow-sm text-[var(--typo-active)] font-semibold" : "hover:text-foreground"].join(" ")}
+              >
+                  <IconLetterA size={13} stroke={2.5} /> words
+              </button>
+           </div>
+
+           <div className="flex items-center gap-1 rounded-xl p-1 bg-muted/60 dark:bg-[#1a1b1e]/80 text-muted-foreground shadow-sm border border-border/10">
+              {(mode === "time" ? TIME_OPTIONS : WORD_OPTIONS).map((opt) => {
+                 const active = mode === "time" ? opt.value === selectedTime : opt.value === selectedWords;
+                 const handleClick = () => {
+                   if (mode === "time") setSelectedTime(opt.value);
+                   else setSelectedWords(opt.value);
+                 };
+                 return (
+                   <button 
+                     key={opt.label}
+                     onClick={handleClick}
+                     className={["flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors", active ? "bg-background dark:bg-[#252729] shadow-sm text-[var(--typo-active)] font-semibold" : "hover:text-foreground"].join(" ")}
+                   >
+                     {active ? opt.label.replace('s', '') : opt.label.replace('s', '')}
+                   </button>
+                 );
+              })}
+           </div>
         </div>
+      )}
 
-        <div className="flex-1" />
-
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => setMode("time")}
-              className={[
-                "px-2 py-1 rounded text-xs font-mono cursor-pointer transition-colors",
-                mode === "time"
-                  ? "text-[var(--typo-active)]"
-                  : "text-muted-foreground hover:text-foreground",
-              ].join(" ")}
-            >
-              ⏱ time
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("words")}
-              className={[
-                "px-2 py-1 rounded text-xs font-mono cursor-pointer transition-colors",
-                mode === "words"
-                  ? "text-[var(--typo-active)]"
-                  : "text-muted-foreground hover:text-foreground",
-              ].join(" ")}
-            >
-              A words
-            </button>
-          </div>
-
-          <span className="text-muted-foreground">|</span>
-
-          <div className="relative flex items-center gap-1 bg-muted rounded-full px-1 py-1">
-            {(mode === "time" && timeIndicatorStyle) || (mode === "words" && wordIndicatorStyle) ? (
-              <div
-                className="absolute rounded-full bg-background transition-all duration-300 ease-in-out shadow-sm"
-                style={{
-                  left: mode === "time" ? timeIndicatorStyle!.left : wordIndicatorStyle!.left,
-                  width: mode === "time" ? timeIndicatorStyle!.width : wordIndicatorStyle!.width,
-                  top: 2,
-                  bottom: 2,
-                }}
-              />
-            ) : null}
-            {(mode === "time" ? TIME_OPTIONS : WORD_OPTIONS).map((opt, idx) => {
-              const active =
-                mode === "time"
-                  ? opt.value === selectedTime
-                  : opt.value === selectedWords;
-              const handleClick = () => {
-                if (mode === "time") {
-                  setSelectedTime(opt.value);
-                } else {
-                  setSelectedWords(opt.value);
-                }
-              };
-              return (
-                <button
-                  key={opt.label}
-                  ref={(el) => {
-                    if (mode === "time") {
-                      timeOptionRefs.current[idx] = el;
-                    } else {
-                      wordOptionRefs.current[idx] = el;
-                    }
-                  }}
-                  type="button"
-                  onClick={handleClick}
-                  className={[
-                    "relative z-10 px-3 py-1 rounded-full text-xs font-mono cursor-pointer transition-colors",
-                    active
-                      ? "text-foreground font-medium"
-                      : "text-muted-foreground hover:text-foreground",
-                  ].join(" ")}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-          <div className="mx-2 text-muted-foreground/30">|</div>
-          <ThemeToggle />
-        </div>
-      </header>}
-
-      <div className="flex-1 w-full flex flex-col items-center">
+      <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center">
         <TypingTest
           mode={mode}
           selectedTime={selectedTime}
@@ -227,8 +171,8 @@ export default function Home() {
       </div>
 
       {testStatus !== "finished" && (
-        <div className="fixed bottom-0 left-0 right-0 flex flex-col items-center justify-center pb-6 bg-gradient-to-t from-background to-transparent pt-10">
-          <div className="w-full max-w-[828px] mx-auto transform scale-100 flex justify-center">
+        <div className="flex-none w-full flex flex-col items-center justify-center relative z-10 pb-6 md:pb-8 pointer-events-none">
+          <div className="w-full max-w-[828px] mx-auto transform origin-bottom scale-75 sm:scale-90 md:scale-[0.85] flex justify-center pointer-events-auto">
             <Keyboard
               theme={theme}
               enableHaptics
@@ -241,8 +185,8 @@ export default function Home() {
 
       {testStatus !== "finished" && (
         <div
-          className="fixed top-14 left-10 z-50 font-mono"
-          style={{ fontSize: "12px", color: "#555" }}
+          className="fixed bottom-6 left-8 z-50 font-mono opacity-60 hover:opacity-100 transition-opacity flex items-center gap-1"
+          style={{ fontSize: "12px", color: "var(--muted-foreground, #888)" }}
         >
           made by{" "}
           <a

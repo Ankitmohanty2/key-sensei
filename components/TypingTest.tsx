@@ -139,8 +139,11 @@ export function TypingTest({
   const lineHeightPx = 64;
   const toolbarFont = "font-mono";
 
+  const errorAudioRef = useRef<HTMLAudioElement | null>(null);
+
   // Generate words on client mount to avoid hydration mismatch
   useEffect(() => {
+    errorAudioRef.current = new Audio("/sounds/public_sounds_fahhhhh.mp3");
     const w = makeWordList(140, false, false);
     setWords(w);
     setTypedWords(Array(w.length).fill(""));
@@ -179,7 +182,9 @@ export function TypingTest({
     lastRecordedSecondRef.current = 0;
 
     onStatusChange?.("idle");
-    requestAnimationFrame(() => inputRef.current?.focus());
+    setTimeout(() => {
+      inputRef.current?.focus({ preventScroll: true });
+    }, 0);
   };
 
   useEffect(() => { reset(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [mode, selectedWords]);
@@ -292,14 +297,24 @@ export function TypingTest({
     startIfNeeded();
     if (status === "finished") return;
     const word = words[currentWordIndex];
+    
+    let isError = false;
     if (currentCharIndex >= word.length) {
       extraCharsRef.current += 1;
+      isError = true;
     } else if (ch === word[currentCharIndex]) {
       correctCharsRef.current += 1;
     } else {
       incorrectCharsRef.current += 1;
       errorsThisSecondRef.current += 1;
+      isError = true;
     }
+
+    if (isError && errorAudioRef.current) {
+      errorAudioRef.current.currentTime = 0;
+      errorAudioRef.current.play().catch(() => {});
+    }
+
     setTypedWords((prev) => {
       const copy = prev.slice();
       copy[currentWordIndex] = (copy[currentWordIndex] ?? "") + ch;
@@ -468,8 +483,10 @@ export function TypingTest({
      ═══════════════════════════════════════════════ */
   return (
     <section
+      onClick={() => inputRef.current?.focus({ preventScroll: true })}
       className={[
-        "w-full max-w-[800px] mx-auto",
+        "w-full max-w-[1040px] px-8 mx-auto",
+        "cursor-default",
         toolbarFont,
         "text-[var(--mt-muted)]",
       ].join(" ")}
@@ -491,7 +508,14 @@ export function TypingTest({
           )}
 
           <div className="relative">
-            <div className="relative overflow-hidden" style={{ height: '12rem' }}>
+            <div 
+              className="relative overflow-hidden" 
+              style={{ 
+                height: '12rem',
+                maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)'
+              }}
+            >
               <div className="transition-transform duration-300 ease-out will-change-transform" style={{ transform: `translateY(${-scrollY}px)` }}>
                 <div className="text-3xl leading-[4rem] tracking-wide select-none" style={{ color: COLORS.muted }}>
                   {words.map((w, wi) => {
@@ -555,6 +579,16 @@ export function TypingTest({
             aria-hidden="true"
           />
         </>
+      </div>
+
+      <div className="mt-4 mb-2 w-full flex flex-col items-center justify-center gap-3 opacity-40 hover:opacity-100 transition-opacity">
+        <button 
+           className="p-2.5 rounded-full hover:bg-muted/30 transition-colors text-muted-foreground hover:text-foreground relative z-20 cursor-pointer" 
+           onClick={(e) => { e.preventDefault(); e.stopPropagation(); reset(); }}
+           title="Restart Test"
+        >
+           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        </button>
       </div>
     </section>
   );
