@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline | Key Sensei</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #09090b;
+            --surface: #18181b;
+            --accent: #d97706; /* Amber-600 */
+            --accent-glow: rgba(217, 119, 6, 0.4);
+            --fg: #fafafa;
+            --fg-muted: #a1a1aa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: 'Bricolage Grotesque', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Abstract topographic/grid background */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background-image: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 50%),
+                              repeating-linear-gradient(rgba(250, 250, 250, 0.02) 0px, transparent 1px, transparent 40px, rgba(250, 250, 250, 0.02) 41px),
+                              repeating-linear-gradient(90deg, rgba(250, 250, 250, 0.02) 0px, transparent 1px, transparent 40px, rgba(250, 250, 250, 0.02) 41px);
+            opacity: 0.5;
+            z-index: 0;
+            animation: slowRotate 120s linear infinite;
+        }
+
+        @keyframes slowRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 600px;
+            padding: 3rem;
+            background: rgba(24, 24, 27, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes revealUp {
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(217, 119, 6, 0.1);
+            border: 1px solid rgba(217, 119, 6, 0.2);
+            color: var(--accent);
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-glow);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(217, 119, 6, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
+        }
+
+        .title {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            letter-spacing: -0.04em;
+            background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .description {
+            font-size: 1.125rem;
+            color: var(--fg-muted);
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+            max-width: 80%;
+            margin-inline: auto;
+        }
+
+        .retry-button {
+            background: var(--fg);
+            color: var(--bg);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1.125rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(250, 250, 250, 0.2);
+            background: #ffffff;
+        }
+
+        .retry-button:active {
+            transform: translateY(0);
+        }
+
+        /* Glitch effect on hover for the icon inside button */
+        .retry-button svg {
+            transition: transform 0.5s ease;
+        }
+        
+        .retry-button:hover svg {
+            transform: rotate(180deg);
+        }
+
+        /* Abstract shapes */
+        .shape {
+            position: absolute;
+            filter: blur(60px);
+            z-index: 1;
+            animation: float 10s ease-in-out infinite alternate;
+        }
+
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background: rgba(217, 119, 6, 0.15);
+            top: -10%;
+            left: -10%;
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+        }
+
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            background: rgba(82, 82, 91, 0.2);
+            bottom: -20%;
+            right: -10%;
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(30px, 50px) rotate(20deg); }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+                border-radius: 20px;
+            }
+            .description {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    
+    <div class="container">
+        <div class="status-badge" style="animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; opacity: 0;">System Offline</div>
+        <h1 class="title" style="animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; opacity: 0;">Connection<br>Severed.</h1>
+        <p class="description" style="animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; opacity: 0;">Your link to Key Sensei has been lost. The network coordinates are currently out of reach.</p>
+        <button class="retry-button" onclick="window.location.reload()" style="animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; opacity: 0;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+            </svg>
+            Re-establish Link
+        </button>
+    </div>
+</body>
+</html>
